@@ -1,0 +1,38 @@
+{
+  "names": [
+    "Jack Reacher",
+    "Ethan Hunt",
+    "Natasha Romanoff",
+    "Lara Croft",
+    "Indiana Jones",
+    "Jason Bourne",
+    "Ellen Ripley",
+    "Tony Stark",
+    "Bruce Wayne",
+    "John Wick"
+  ],
+  "origins": [
+    "Bengaluru",
+    "New York",
+    "London",
+    "Tokyo",
+    "Paris",
+    "Dubai",
+    "Sydney",
+    "Berlin",
+    "São Paulo",
+    "Cape Town"
+  ],
+  "destinations": [
+    "Mumbai",
+    "San Francisco",
+    "Rome",
+    "Hong Kong",
+    "Toronto",
+    "Singapore",
+    "Barcelona",
+    "Seoul",
+    "Amsterdam",
+    "Moscow"
+  ]
+}

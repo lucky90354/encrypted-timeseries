@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: encrypted-timeseries-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    container_name: encrypted-timeseries-app
+    ports:
+      - "5000:5000" 
+      - "4000:4000"
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/encrypted_timeseries
+      - SOCKET_PORT=5000
+      - WS_PORT=4000
+      - FRONTEND_PORT=3000
+      - AES_PASSPHRASE=change-me-to-a-secret-key-32b
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

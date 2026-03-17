@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encrypted Timeseries Dashboard</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        padding: 16px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      header {
+        margin-bottom: 24px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 6px 8px;
+        text-align: left;
+      }
+      th {
+        background: #f3f3f3;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .stat {
+        padding: 12px;
+        background: #f9f9ff;
+        border-radius: 8px;
+        border: 1px solid #e1e1f1;
+      }
+      .stat h3 {
+        margin: 0 0 4px 0;
+        font-size: 0.9rem;
+        color: #333;
+      }
+      .stat p {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Encrypted Timeseries Dashboard</h1>
+      <p>
+        This dashboard displays records as the listener validates and stores them.
+      </p>
+    </header>
+
+    <section class="stats">
+      <div class="stat">
+        <h3>Total Received</h3>
+        <p id="received">0</p>
+      </div>
+      <div class="stat">
+        <h3>Valid Stored</h3>
+        <p id="valid">0</p>
+      </div>
+      <div class="stat">
+        <h3>Success Rate</h3>
+        <p id="rate">0%</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Recent Records</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+          </tr>
+        </thead>
+        <tbody id="records"></tbody>
+      </table>
+    </section>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      const WS_URL = 'http://localhost:4000';
+      const socket = io(WS_URL);
+
+      const receivedEl = document.getElementById('received');
+      const validEl = document.getElementById('valid');
+      const rateEl = document.getElementById('rate');
+      const recordsEl = document.getElementById('records');
+
+      const maxRows = 50;
+
+      function addRecords(items) {
+        items.forEach((item) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${new Date(item.timestamp).toLocaleString()}</td>
+            <td>${item.name}</td>
+            <td>${item.origin}</td>
+            <td>${item.destination}</td>
+          `;
+          recordsEl.prepend(tr);
+        });
+
+        while (recordsEl.childElementCount > maxRows) {
+          recordsEl.removeChild(recordsEl.lastChild);
+        }
+      }
+
+      function updateStats(stats) {
+        receivedEl.textContent = stats.received;
+        validEl.textContent = stats.valid;
+        rateEl.textContent = stats.successRate + '%';
+      }
+
+      socket.on('connect', () => {
+        console.log('Connected to listener socket');
+      });
+
+      socket.on('stats', (stats) => {
+        updateStats(stats);
+      });
+
+      socket.on('data', (payload) => {
+        updateStats(payload.stats);
+        addRecords(payload.items);
+      });
+    </script>
+  </body>
+</html>
